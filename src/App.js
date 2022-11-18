@@ -1,6 +1,7 @@
 import './App.css';
 import { useState, useEffect } from 'react'
 import { UserTable } from './components/UserTable';
+import { Link } from "react-router-dom";
 import { User } from './components/User';
 
 
@@ -18,7 +19,7 @@ function App() {
       .then(response => response.json())
       .then(data => setUsers(data))
       .catch((error) => {
-        console.log("ERROR:" + error);
+        console.log("ERROR" + error);
       })
   }
 
@@ -26,30 +27,34 @@ function App() {
 
 
   // Filters
-  const [filter, setFilter] = useState();
+  const [selectedFilter, setFilter] = useState("");
 
-  function changeFilter(e) {
-    setFilter(e.target.value);
-    console.log(e.target.value);
-    console.log(filter);
+  const changeSelectedFilter = (e) => {
+    // console.log("filtro actual: " + selectedFilter);
+    setFilter(e.target.value)
   }
-
-  // function getList() {
-  //   if (!filter) {
-  //     return
-  //   }
-  // }
-  //Filters
-  // const filters = ["name", "username", "email", "phone"];
 
   //Query
   const [query, setQuery] = useState("");
 
-
-
+  //Search name,email,username or phone depends on the filter
   const search = (data) => {
-    return data.filter(
-      item => item.name.toLowerCase().includes(query));
+    const colum = selectedFilter;
+
+    if (colum === "" || colum === "name") {
+      return data.filter(
+        item => item.name.toLowerCase().includes(query));
+    }
+    else if (colum === "username") {
+      return data.filter(
+        item => item.username.toLowerCase().includes(query));
+    } else if (colum === "email") {
+      return data.filter(
+        item => item.email.toLowerCase().includes(query));
+    } else {
+      return data.filter(
+        item => item.phone.toLowerCase().includes(query));
+    }
   }
 
 
@@ -57,7 +62,7 @@ function App() {
     <div className="App">
       <h1>PRUEBA DE NIVEL</h1>
 
-      <select className='select' onChange={changeFilter}>
+      <select className='select' onChange={changeSelectedFilter}>
         <option value="">All</option>
         <option value="name">Name</option>
         <option value="username">Username</option>
@@ -70,9 +75,8 @@ function App() {
         className='search'
         onChange={e => setQuery(e.target.value.toLowerCase())}
       />
-      <UserTable data={search(users)} />
-
-      <User data={users} />
+      <User />
+      {/* <UserTable data={search(users)} filter={selectedFilter} /> */}
 
     </div>
   );
